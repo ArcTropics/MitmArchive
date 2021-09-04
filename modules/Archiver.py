@@ -72,9 +72,9 @@ class Archiver:
             for header in flow.response.headers:
                 f.write(header + ": " + flow.response.headers[header])
 
-        
-    def archive(self, flow: mitmproxy.http.HTTPFlow):
 
+    def archiveFlow(self, flow: mitmproxy.http.HTTPFlow):
+        
         DICT = {}
         
         DICT["outputPath"] = (pathlib.Path(os.getcwd()) / "output")
@@ -99,3 +99,10 @@ class Archiver:
         self.storeMeta(flow, DICT)
         self.storeContent(flow, DICT)
         self.storeHeaders(flow, DICT)
+
+        
+    def archive(self, flow: mitmproxy.http.HTTPFlow):
+        try:
+            self.archiveFlow(flow)
+        except Exception as e:
+            print("Exception while writing flow: " + str(e))

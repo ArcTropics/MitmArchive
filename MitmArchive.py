@@ -76,12 +76,14 @@ class MitmArchive:
 
         for p in patterns:
             print("allowing host: " + str(p))
-            command += " --allow-hosts '" + p + "'"
+            command += " --allow-hosts '" + p + ":443$'"
+            command += " --allow-hosts '" + p + ":80$'"
 
         for ap in antipatterns:
             print("ignoring host: " + str(ap))
-            command += " --ignore-hosts '" + ap + "'"
-                    
+            command += " --ignore-hosts '" + ap + ":443$'"
+            command += " --ignore-hosts '" + ap + ":80$'"
+            
         filepath = (pathlib.Path(__file__).parent / "MitmRoot.py").resolve()
         command += " -s " + str(filepath)
 

@@ -49,10 +49,10 @@ class mitmRoot:
 
                 
                 #for later
-                #self.executor.submit(self.archivingThread,(flow))
+                self.executor.submit(self.archiver.archive,(flow))
                 print("MATCH")
         
-        self.archiver.archive(flow)
+                #self.archiver.archive(flow)
         
     def archivingThread(self, flow):
         print("hello from archiver")
