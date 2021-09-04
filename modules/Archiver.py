@@ -27,7 +27,6 @@ class Archiver:
         print(url)
         print("creating path: " + str(path))
         print("filename: " + str(name))
-        path.mkdir(parents=True, exist_ok=True)
 
         DICT["path"] = path
         DICT["name"] = name
@@ -48,28 +47,28 @@ class Archiver:
         metaDict["response-code"] = flow.response.status_code
 
         js = json.dumps(metaDict, indent = 4)
-        with open(str(DICT["path_prefix"]) + "_meta.json","w") as f:
+        with open(str(DICT["path_prefix"] / "meta.json"),"w") as f:
             f.write(js)
         
         
         
     def storeContent(self, flow, DICT):
 
-        with open(str(DICT["path_prefix"]) + "_request_body.txt","w") as f:
+        with open(str(DICT["path_prefix"] / "request_body.txt"),"w") as f:
             f.write(flow.request.text)
 
         
-        with open(str(DICT["path_prefix"]) + "_response_body.txt","w") as f:
+        with open(str(DICT["path_prefix"] / "response_body.txt"),"w") as f:
             f.write(flow.response.text)
         
 
     def storeHeaders(self, flow, DICT):
         
-        with open(str(DICT["path_prefix"]) + "_request_headers.txt","w") as f:
+        with open(str(DICT["path_prefix"] / "request_headers.txt"),"w") as f:
             for header in flow.request.headers:
                 f.write(header + ": " + flow.request.headers[header])
         
-        with open(str(DICT["path_prefix"]) + "_response_headers.txt","w") as f:
+        with open(str(DICT["path_prefix"] / "response_headers.txt"),"w") as f:
             for header in flow.response.headers:
                 f.write(header + ": " + flow.response.headers[header])
 
@@ -91,8 +90,10 @@ class Archiver:
         print("date and time:",date_time)	
         
         DICT["ts"] = date_time
-        DICT["prefix"] = DICT["name"] + "-_-" + DICT["ts"] + "_"
+        DICT["prefix"] = "ENDPOINT_" + DICT["name"] + "/" + DICT["ts"]
         DICT["path_prefix"] = DICT["path"] / DICT["prefix"]
+
+        DICT["path_prefix"].mkdir(parents=True, exist_ok=True)
 
         
         self.storeMeta(flow, DICT)
