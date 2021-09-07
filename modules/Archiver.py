@@ -45,7 +45,12 @@ class Archiver:
         metaDict["fragment"] = url.fragment
                 
         metaDict["response-code"] = flow.response.status_code
-
+        metaDict["method"] = flow.request.method
+        print(flow.request.method)
+        metaDict["port"] = flow.request.port
+        metaDict["http_version"] = flow.request.http_version
+        
+        
         js = json.dumps(metaDict, indent = 4)
         with open(str(DICT["path_prefix"] / "meta.json"),"w") as f:
             f.write(js)
