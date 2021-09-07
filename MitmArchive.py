@@ -17,9 +17,11 @@ from modules.PipeProcessor import PipeProcessor
 
 class MitmArchive:
 
-    def __init__(self, port):
+    def __init__(self, port, archiveEn, extras):
         self.process=None
         self.port = port
+        self.archiveEn = archiveEn
+        self.extras = extras
         self.run()
 
     def processStdout(self, line):
@@ -72,6 +74,8 @@ class MitmArchive:
         command = "mitmdump"
         command += " --listen-port " + str(self.port)
 
+        command += " " + str(self.extras)
+
         patterns, antipatterns = self.patternExtractor(".scope")
 
         for p in patterns:
@@ -84,8 +88,9 @@ class MitmArchive:
             command += " --ignore-hosts '" + ap + ":443$'"
             command += " --ignore-hosts '" + ap + ":80$'"
             
-        filepath = (pathlib.Path(__file__).parent / "MitmRoot.py").resolve()
-        command += " -s " + str(filepath)
+        if self.archiveEn:
+            filepath = (pathlib.Path(__file__).parent / "MitmRoot.py").resolve()
+            command += " -s " + str(filepath)
 
         print(command)
         
@@ -104,14 +109,20 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser()
 
     # Add the arguments to the parser
-    ap.add_argument("-a", "--foperand", required=False, help="first operand")
+
     ap.add_argument("-t", "--soperand", required=False, help="second operand")
-    ap.add_argument("-e", "--extra_args", required=False, help="Additional Arguments for Mitmdump")
+    ap.add_argument("-e", "--extra_args", required=False, default="", help="Additional Arguments for Mitmdump")
     ap.add_argument("-p", "--port", required=False, default=8080, help="The port on which the proxy is going to listen")
+    ap.add_argument("-a", "--archive", required=False, default="True", help="Use this flag to disable archiving (Proxy without writing to disk)")
     
+
     args = vars(ap.parse_args())
-
     port = int(args['port'])
+    archiveEn = False
+    if args['archive'] == "True":
+        archiveEn = True
 
-    archive = MitmArchive(port)
+    extras = args['extra_args']
+        
+    archive = MitmArchive(port, archiveEn, extras)
     
