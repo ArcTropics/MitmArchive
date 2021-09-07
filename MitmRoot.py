@@ -1,11 +1,13 @@
 import os
 import sys
+import json
 
 from inspect import getmembers
 import mitmproxy.http
 from mitmproxy import ctx
 from urllib.parse import urlparse
 from concurrent.futures import ThreadPoolExecutor
+
 
 import pathlib
 filepath = pathlib.Path(__file__).parent.resolve()
@@ -15,7 +17,7 @@ sys.path.append(filepath)
 
 from modules.RexpMatcher import RexpMatcher
 from modules.Archiver import Archiver
-
+from modules.DnsResolver import DnsResolver
 
 class mitmRoot:
 
@@ -28,6 +30,23 @@ class mitmRoot:
         except:
             pass
 
+        try:
+            with open(".archive_conf.json", "r") as f:
+                config = f.read()
+                configDict = json.loads(config)
+
+                self.dnsResolver = None
+                interface = configDict["dns-recording"]
+                if interface != "None":
+                    print("INTERFACE")
+                    self.dnsResolver = DnsResolver(interface)
+                    self.dnsResolver.execute()
+                    
+        except Exception as e:
+            print(str(e))
+            pass
+
+
         
         self.inscope = RexpMatcher(".scope")
         print("inscope file found: " + str(self.inscope.fileFound))
@@ -37,6 +56,7 @@ class mitmRoot:
 
         self.executor = ThreadPoolExecutor(self.NUM_THREADS)
         self.archiver = Archiver()
+
         
 
     def response(self, flow: mitmproxy.http.HTTPFlow):

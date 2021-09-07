@@ -7,6 +7,15 @@ import mitmproxy
 
 from urllib.parse import urlparse
 from datetime import datetime
+from urllib.parse import urlsplit, urlunsplit
+
+import pathlib
+filepath = pathlib.Path(__file__).parent.resolve()
+
+import sys
+sys.path.append(filepath)
+
+from modules.DnsResolver import DnsResolver
 
 
 class Archiver:        
@@ -83,8 +92,20 @@ class Archiver:
         DICT = {}
         
         DICT["outputPath"] = (pathlib.Path(os.getcwd()) / "output")
-        DICT["url"] = urlparse(flow.request.url)
+        url = urlparse(flow.request.url)
 
+        try:
+            if DnsResolver.dnsTable.get(url.netloc, "None") is not "None":
+                print("REPLACING URL NETLOC:")
+                print(url.netloc)
+                url = urlparse(flow.request.url.replace(url.netloc, DnsResolver.dnsTable[url.netloc][0]))
+                print(url.netloc)
+
+        except Exception as e:
+            print(str(e))
+        
+        DICT["url"] = url
+        
         self.createFolder(DICT)
 
         print("creating folder: " + str(DICT["path"]))
