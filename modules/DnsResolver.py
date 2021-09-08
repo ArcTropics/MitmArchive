@@ -21,7 +21,7 @@ class DnsResolver:
         self.process = None
         self.saveTimer = None
         self.interface = interface
-        
+        self.load()
 
     def load(self):
         try:
@@ -63,8 +63,8 @@ class DnsResolver:
                 #remove duplicates
                 res = []
                 [res.append(x) for x in hostname if x not in res]
-
-                DnsResolver.dnsTable[match[1]] = hostname
+                
+                DnsResolver.dnsTable[match[1]] = res
                 getHost = False
                 
             elif "CNAME" in part:
@@ -72,10 +72,19 @@ class DnsResolver:
 
             elif getHost:
                 hosts.append(part)
+
+    def cleanup(self):
+        for key in DnsResolver.dnsTable:
+            hosts = DnsResolver.dnsTable[key]
+            
+            res = []
+            [res.append(x) for x in hosts if x not in res]
+
+            DnsResolver.dnsTable[key] = res
+
+        self.save()
                 
     def execute(self):        
-
-        self.load()
                 
         self.process = subprocess.Popen("tcpdump -n -s 1500 udp and port 53 -v -i " + self.interface, shell=True, stderr=subprocess.PIPE, stdout=subprocess.PIPE,  stdin=subprocess.PIPE)                
         self.pipeProcessor = PipeProcessor(self.processStdout, self.process.stdout)

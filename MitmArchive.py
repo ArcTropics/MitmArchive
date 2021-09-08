@@ -12,7 +12,7 @@ import sys
 sys.path.append(filepath)
 
 from modules.PipeProcessor import PipeProcessor
-
+from modules.DnsResolver import DnsResolver
 
 
 
@@ -112,13 +112,20 @@ if __name__ == "__main__":
     # Add the arguments to the parser
 
     ap.add_argument("-d", "--dns_recording", required=False, default="None", help="-d/--dns-recording [interface] Activate Dns Recording on interface, this helps you to recover dns hostnames in case your configuration leaves you with ip addresses only")
+    ap.add_argument("--dnsrecord-clean", dest='dnsrecord-clean', action='store_true', help="-cleanup and remove duplicates from dns records")
     ap.add_argument("-t", "--soperand", required=False, help="second operand")
     ap.add_argument("-e", "--extra_args", required=False, default="", help="Additional Arguments for Mitmdump")
     ap.add_argument("-p", "--port", required=False, default=8080, help="The port on which the proxy is going to listen")
     ap.add_argument("-a", "--archive", required=False, default="True", help="Use this flag to disable archiving (Proxy without writing to disk)")
-    
-
     args = vars(ap.parse_args())
+
+    if args['dnsrecord-clean']:
+        print("Cleaning up dns records")
+        dns = DnsResolver(None)
+        dns.cleanup()
+        sys.exit(0)
+
+
     port = int(args['port'])
     archiveEn = False
     if args['archive'] == "True":
