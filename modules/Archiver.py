@@ -68,8 +68,9 @@ class Archiver:
         
     def storeContent(self, flow, DICT):
 
-        with open(str(DICT["path_prefix"] / "request_body.txt"),"w") as f:
-            f.write(flow.request.text)
+        if len(flow.request.text) > 0:
+            with open(str(DICT["path_prefix"] / "request_body.txt"),"w") as f:
+                f.write(flow.request.text)
 
         
         with open(str(DICT["path_prefix"] / "response_body.txt"),"w") as f:
@@ -80,7 +81,7 @@ class Archiver:
         
         with open(str(DICT["path_prefix"] / "request_headers.txt"),"w") as f:
             for header in flow.request.headers:
-                f.write(header + ": " + flow.request.headers[header])
+                f.write(header + ": " + flow.request.headers[header] + "\n")
         
         with open(str(DICT["path_prefix"] / "response_headers.txt"),"w") as f:
             for header in flow.response.headers:
