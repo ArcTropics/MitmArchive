@@ -112,7 +112,9 @@ if __name__ == "__main__":
     # Add the arguments to the parser
 
     ap.add_argument("-d", "--dns_recording", required=False, default="None", help="-d/--dns-recording [interface] Activate Dns Recording on interface, this helps you to recover dns hostnames in case your configuration leaves you with ip addresses only")
-    ap.add_argument("--dnsrecord-clean", dest='dnsrecord-clean', action='store_true', help="-cleanup and remove duplicates from dns records")
+    ap.add_argument("--dnsrecord-clean", dest='dnsrecord-clean', action='store_true', help="cleanup and remove duplicates from dns records")
+    ap.add_argument("--dnsrecord-apply", dest='dnsrecord-apply', action='store_true', help="Applies dns records to output folder, IP addresses which are known to the dnsRecords file will be renamed to the particular hostname")
+
     ap.add_argument("-t", "--soperand", required=False, help="second operand")
     ap.add_argument("-e", "--extra_args", required=False, default="", help="Additional Arguments for Mitmdump")
     ap.add_argument("-p", "--port", required=False, default=8080, help="The port on which the proxy is going to listen")
@@ -120,11 +122,20 @@ if __name__ == "__main__":
     args = vars(ap.parse_args())
 
     if args['dnsrecord-clean']:
+        #Todo ask user here 
         print("Cleaning up dns records")
         dns = DnsResolver(None)
         dns.cleanup()
         sys.exit(0)
 
+    if args['dnsrecord-apply']:
+        #Todo ask user here 
+        print("Cleaning up dns records")
+        dns = DnsResolver(None)
+        dns.apply()
+        sys.exit(0)
+        
+        
 
     port = int(args['port'])
     archiveEn = False
