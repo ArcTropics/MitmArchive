@@ -96,12 +96,13 @@ class Archiver:
         url = urlparse(flow.request.url)
 
         try:
-            if DnsResolver.dnsTable.get(url.netloc, "None") is not "None":
+            host = DnsResolver.resolveIp(url.netloc)
+            if host:
                 print("REPLACING URL NETLOC:")
                 print(url.netloc)
-                url = urlparse(flow.request.url.replace(url.netloc, DnsResolver.dnsTable[url.netloc][0]))
+                url = urlparse(flow.request.url.replace(url.netloc, host))
                 print(url.netloc)
-
+                
         except Exception as e:
             print(str(e))
         
